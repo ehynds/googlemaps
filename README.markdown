@@ -1,4 +1,4 @@
-This is a simple Google maps class that addresses the following common issues I run into:
+This is a simple Google Maps class that addresses the following common issues I run into:
 
 - Allows you to map both addresses and coordinates at the same time.
 - Combats the 620 (too many requests) geocoding error by passing each address to the geocoder with a configurable delay, and will
