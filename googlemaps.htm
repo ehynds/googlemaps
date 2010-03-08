@@ -3,6 +3,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Google Maps</title>
+<style type="text/css">
+p { margin:0 }
+</style>
+
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=true&amp;key=ABQIAAAADGIR8Lolw9pKIAUyVrjNURR6JdhhVhDV3ZtyKsIjAts5yKyeRBSYFs9xY_X5-PFEAFQ9PxfC43mFLw" type="text/javascript"></script>
 <script src="googlemaps.js" type="text/javascript"></script>
 
@@ -25,7 +29,7 @@ var map = new GoogleMap({
 	// locations to place on the map.  takes an array:
 	// ['longitude', 'latitude', 'info window HTML']
 	// ['street address', 'info window HTML']
-	locations:[
+	locations: [
 		['42.867912','-75.981445','I have family in this state'],
 		['Newton, MA', 'Where I live!'],
 		['279 Main Street, North Chatham, MA', 'My Office'],
@@ -40,30 +44,32 @@ var map = new GoogleMap({
 		['this address is BUSTED!', '']
 	],
 	
-	// callbacks...
 	// 'this' is these callbacks is a reference to Google's GMap2 object
 	onLoad: function(locations){
-		console.log('Attemping to map %n points', locations.length);
+		document.getElementById('status').innerHTML = '<p>Attempting to map <b>' + locations.length + '</b> points.</p>'; 
 	},
 	onComplete: function(points){ 
-		console.log('Done! Successfully added %n points to the map.', points); 
+		document.getElementById('status').innerHTML += '<p><b>Done!</b> Successfully added ' + points + ' points to the map.';
 	},
 	onProcess: function(location, statusCode){
 		statusCode = statusCode || 'This location was not geocoded.';
-		console.log('Currently processing location %l; returned geocode status: %s', location, statusCode); 
+		document.getElementById('status').innerHTML += '<p>Adding location <b>' + location + '</b> to the map (status code: '+statusCode+')</p>';
 	}
+
 });
 
+// add points this way
+map.addPoint('California, USA', 'My dad used to work here');
 </script>
 
 </head>
 <body>
 
-<p>Load up your console and click &quot;Load map&quot;.</p>
-
 <div id="map1" style="width:600px;height:400px">
-	<a href="#" onclick="map.load();return false">Load map</a>
+	<a href="#" onclick="map.draw(); return false">Load map</a>
 </div>
+
+<div id="status"></div>
 
 
 

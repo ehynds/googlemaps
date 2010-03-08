@@ -1,16 +1,8 @@
-var GoogleMap = function(options){
+var GoogleMap = function( options ){
 	options = options || {};
+	options.locations = options.locations || [];
 	
-	var map, bounds, counter = options.locations.length, geo = new GClientGeocoder(), points = 0;
-
-	// initializes the google map
-	var init = function(){
-		map = new GMap2(document.getElementById(options.id));
-		map.setCenter(new GLatLng(options.defaultCenter[0], options.defaultCenter[1]), options.defaultCenter[2]);
-		map.setUIToDefault();
-		map.setMapType(options.type);
-		bounds = new GLatLngBounds();
-	};
+	var map, bounds, geo = new GClientGeocoder(), points = 0, counter = 0;
 	
 	// geocodes an address
 	var geocode = function( address, html ){
@@ -46,6 +38,7 @@ var GoogleMap = function(options){
 	// adds a point to the map
 	var addToMap = function( latitude, longitude, html ){
 		var point = new GLatLng(latitude,longitude), marker = createMarker(point,html);
+		
 		bounds.extend(point);
 		map.addOverlay(marker);
 		points++;
@@ -57,9 +50,11 @@ var GoogleMap = function(options){
 	// creates an info marker
 	var createMarker = function( point, html ){
 		var marker = new GMarker(point);
+		
 		GEvent.addListener(marker, "click", function(){
 			marker.openInfoWindowHtml(html);
 		});
+		
 		return marker;
 	};
 	
@@ -72,12 +67,6 @@ var GoogleMap = function(options){
 			map.setCenter(bounds.getCenter(), map.getBoundsZoomLevel(bounds));
 			options.onComplete.call( map, points );
 			return;
-		}
-		
-		// create the google map instance on the first call
-		if(typeof map === 'undefined'){
-			options.onLoad.call( map, options.locations );
-			init();
 		}
 		
 		// is this location an address?
@@ -93,8 +82,28 @@ var GoogleMap = function(options){
 	};
 
 	return {
-		load:process,
-		options:options
+		draw: function(){
+			map = new GMap2(document.getElementById(options.id));
+			map.setCenter(new GLatLng(options.defaultCenter[0], options.defaultCenter[1]), options.defaultCenter[2]);
+			map.setUIToDefault();
+			map.setMapType(options.type);
+			bounds = new GLatLngBounds();
+			
+			// how many points do we have?
+			counter = options.locations.length;
+			
+			// fire the onload callback
+			options.onLoad.call( map, options.locations );
+			
+			process();
+		},
+		
+		addPoint: function( lon, lat, html ){
+			options.locations.push.call(options.locations, arguments);
+		},
+		
+		options: options
 	};
 };
+
 
