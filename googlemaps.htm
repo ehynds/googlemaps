@@ -7,7 +7,7 @@
 p { margin:0 }
 </style>
 
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=true&amp;key=ABQIAAAADGIR8Lolw9pKIAUyVrjNURR6JdhhVhDV3ZtyKsIjAts5yKyeRBSYFs9xY_X5-PFEAFQ9PxfC43mFLw" type="text/javascript"></script>
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=true&amp;key=ABQIAAAADGIR8Lolw9pKIAUyVrjNURQcL4dYG68um1oVIF9FH7moquIpNxRZ83rfM0pnqWMsCKzimG_UcqV3CA" type="text/javascript"></script>
 <script src="googlemaps.js" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -26,22 +26,47 @@ var map = new GoogleMap({
 	// default long, lat, and zoom level for when the map first loads
 	defaultCenter: [41.750824, -69.984283, 7],
 	
-	// locations to place on the map.  takes an array:
-	// ['longitude', 'latitude', 'info window HTML']
-	// ['street address', 'info window HTML']
+	// locations to place on the map.  takes an array.
 	locations: [
-		['42.867912','-75.981445','I have family in this state'],
-		['Newton, MA', 'Where I live!'],
-		['279 Main Street, North Chatham, MA', 'My Office'],
-		['Science Park, Boston MA', 'Science Park in Boston'],
-		['Orleans, MA', 'Orleans'],
-		['Eastham MA', 'Eastham'],
-		['Chatham, MA', 'Where I grew up'],
-		['Champlain College, Burlington VT', 'Where I went to school'],
-		['Burlington, VT', 'The best city in the country'],
-		['Westminster, MA', 'My girlfriend lives here'],
-		['Lake Champlain, VT', 'I pulled a decent size lake trout out of here once'],
-		['this address is BUSTED!', '']
+		['42.867912', '-75.981445', { 
+			title: 'New York!',
+			description: 'I have family in this state.  This point was also added by coords, not an address.'
+		}],
+		['Newton, MA', {
+			title: 'Home',
+			description: 'This is where I live'
+		}],
+		['279 Main Street, North Chatham, MA', {
+			title: 'My Office',
+			description: 'Where I work'
+		}],
+		['Science Park, Boston MA', {
+			title: 'Science Park in Boston',
+			description: 'There\'s a cool Science Museum here.'
+		}],
+		['Orleans, MA', {
+			title: 'Orleans',
+			description: 'A cool town'
+		}],
+		['Eastham MA', {
+			title: 'Eastham',
+			description: 'A cool town'
+		}],
+		['Chatham, MA', {
+			title: 'Chatham',
+			description: 'Where I grew up'
+		}],
+		['Champlain College, Burlington VT', {
+			title: 'Burlington, VT',
+			description: 'I went to school here'
+		}],
+		['Lake Champlain, VT', {
+			title: 'Lake Champlain',
+			description: 'I pulled a decent size lake trout out of here once.'
+		}],
+		['this address is BUSTED!', {
+			title: 'This address will not work.'
+		}]
 	],
 	
 	// 'this' is these callbacks is a reference to Google's GMap2 object
@@ -58,8 +83,11 @@ var map = new GoogleMap({
 
 });
 
-// add points this way
-map.addPoint('California, USA', 'My dad used to work here');
+// options can also be set like so:
+map.setOption('template', '<strong>#{title}</strong><div style="width:200px">#{description}</div>');
+
+// and points can be added like such::
+map.addPoint('California, USA', { title:'California', description: 'Cali' });
 </script>
 
 </head>

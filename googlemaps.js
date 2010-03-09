@@ -1,11 +1,19 @@
 var GoogleMap = function( options ){
-	options = options || {};
-	options.locations = options.locations || [];
+
+	// param the options
+	options 				= options || {};
+	options.type 			= options.typle || G_NORMAL_MAP;
+	options.delay			= options.delay || 100;
+	options.defaultCenter	= options.defaultCenter || [0,0];
+	options.locations 		= options.locations || [];
+	options.onLoad			= options.onLoad || function(){};
+	options.onProcess		= options.onProcess || function(){};
+	options.onComplete		= options.onComplete || function(){};
 	
-	var map, bounds, geo = new GClientGeocoder(), points = 0, counter = 0;
+	var map, bounds, points = 0, counter = 0;
 	
 	// geocodes an address
-	var geocode = function( address, html ){
+	var geocode = function( address, params ){
 		
 		// send the address to the geocoder in a timer to prevent the G_GEO_TOO_MANY_QUERIES error
 		setTimeout(function(){
@@ -20,14 +28,14 @@ var GoogleMap = function( options ){
 					var place = result.Placemark[0], coords = place.Point.coordinates, latitude = coords[1], longitude = coords[0];
 					
 					// send the coords into the mapper
-					addToMap(latitude, longitude, html);
+					addToMap(latitude, longitude, params);
 			
 				// if we overloaded the geocoder, retry this one again
 				} else if (statusCode === 620){
 					counter++;
 				}
 				
-				// keep processing if the point never made it to the map.
+				// keep processing if the point isn't legit.
 				if(statusCode !== 200){
 					process();
 				}
@@ -36,8 +44,8 @@ var GoogleMap = function( options ){
 	};
 	
 	// adds a point to the map
-	var addToMap = function( latitude, longitude, html ){
-		var point = new GLatLng(latitude,longitude), marker = createMarker(point,html);
+	var addToMap = function( latitude, longitude, params ){
+		var point = new GLatLng(latitude,longitude), marker = createMarker( point, params );
 		
 		bounds.extend(point);
 		map.addOverlay(marker);
@@ -48,8 +56,14 @@ var GoogleMap = function( options ){
 	};
 	
 	// creates an info marker
-	var createMarker = function( point, html ){
+	var createMarker = function( point, params ){
+		params = params || {};
+		
 		var marker = new GMarker(point);
+		var html = options.template.replace(/#\{(.*?)\}/g, function($1, $2){
+			return ($2 in params) ? params[$2] : '';
+		});
+		
 		
 		GEvent.addListener(marker, "click", function(){
 			marker.openInfoWindowHtml(html);
@@ -69,6 +83,11 @@ var GoogleMap = function( options ){
 			return;
 		}
 		
+		// param the last item as an object
+		if(typeof location[location.length-1] !== 'object'){
+			location.push({});
+		}
+		
 		// is this location an address?
 		if(location.length === 2){
 			geocode(location[0],location[1]);
@@ -83,6 +102,7 @@ var GoogleMap = function( options ){
 
 	return {
 		draw: function(){
+			geo = new GClientGeocoder();
 			map = new GMap2(document.getElementById(options.id));
 			map.setCenter(new GLatLng(options.defaultCenter[0], options.defaultCenter[1]), options.defaultCenter[2]);
 			map.setUIToDefault();
@@ -98,8 +118,12 @@ var GoogleMap = function( options ){
 			process();
 		},
 		
-		addPoint: function( lon, lat, html ){
-			options.locations.push.call(options.locations, arguments);
+		setOption: function( key, val ){
+			options[key] = val;
+		},
+		
+		addPoint: function( lon, lat, params ){
+			options.locations.push(Array.prototype.slice.call(arguments));
 		},
 		
 		options: options
