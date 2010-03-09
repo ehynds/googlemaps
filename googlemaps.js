@@ -91,6 +91,8 @@ var GoogleMap = function( options ){
 			zoomlevel = (zoomlevel > options.maxZoomLevel) ? options.maxZoomLevel : zoomlevel;
 			
 			map.setCenter(bounds.getCenter(), zoomlevel);
+			
+			// TODO - pass in an array of all successful points
 			options.onComplete.call( map, points );
 			return;
 		}
