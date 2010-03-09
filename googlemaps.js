@@ -2,13 +2,19 @@ var GoogleMap = function( options ){
 
 	// param the options
 	options = options || {};
-	options.type = options.typle || G_NORMAL_MAP;
+	
+	// see http://code.google.com/apis/maps/documentation/reference.html#GMapOptions
+	options.GMapOptions = {};
+	
+	options.type = options.type || G_NORMAL_MAP;
 	options.delay = options.delay || 100;
-	options.defaultCenter = options.defaultCenter || [0,0];
+	options.defaultCenter = options.defaultCenter || [37.0625, -95.677068, 3];
+	options.maxZoomLevel = 30;
 	options.locations = options.locations || [];
 	options.onLoad = options.onLoad || function(){};
 	options.onProcess = options.onProcess || function(){};
 	options.onComplete = options.onComplete || function(){};
+	options.template = "";
 	
 	var map, geo, bounds, points = 0, counter = 0;
 	
@@ -35,7 +41,7 @@ var GoogleMap = function( options ){
 					counter++;
 				}
 				
-				// keep processing if the point isn't legit.
+				// keep processing if the point isn't legit.  note that if a 620 occured, calling process() will retry said point
 				if(statusCode !== 200){
 					process();
 				}
@@ -75,7 +81,10 @@ var GoogleMap = function( options ){
 		
 		// once all the points are on the map, re-center/zoom it and bail
 		if(counter < 0){
-			map.setCenter(bounds.getCenter(), map.getBoundsZoomLevel(bounds));
+			var zoomlevel = map.getBoundsZoomLevel(bounds);
+			zoomlevel = zoomlevel > options.maxZoomLevel ? options.maxZoomLevel : zoomlevel;
+			
+			map.setCenter(bounds.getCenter(), zoomlevel);
 			options.onComplete.call( map, points );
 			return;
 		}
@@ -100,10 +109,11 @@ var GoogleMap = function( options ){
 	return {
 		draw: function(){
 			geo = new GClientGeocoder();
-			map = new GMap2(document.getElementById(options.id));
-			map.setCenter(new GLatLng(options.defaultCenter[0], options.defaultCenter[1]), options.defaultCenter[2]);
-			map.setUIToDefault();
+			map = new GMap2(document.getElementById(options.id), options.GMapOptions);
 			map.setMapType(options.type);
+			map.setUIToDefault();
+			map.setCenter(new GLatLng(options.defaultCenter[0], options.defaultCenter[1]), options.defaultCenter[2]);
+			
 			bounds = new GLatLngBounds();
 			
 			// how many points do we have?
@@ -112,7 +122,9 @@ var GoogleMap = function( options ){
 			// fire the onload callback
 			options.onLoad.call( map, options.locations );
 			
-			process();
+			if(options.locations.length){
+				process();
+			}
 		},
 		
 		setOption: function( key, val ){
