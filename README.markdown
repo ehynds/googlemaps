@@ -1,4 +1,4 @@
-## Google Maps
+# Google Maps
 
 This is a simple Google Maps script that addresses the following common issues I run into:
 
