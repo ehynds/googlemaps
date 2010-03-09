@@ -54,7 +54,7 @@ This module comes with a real basic templating system (variable replacement only
 
 Three callbacks are available:
 
-- onLoad fires when draw() is called:
+onLoad fires when draw() is called:
 
 	onLoad: function(locations){
 	
@@ -63,18 +63,18 @@ Three callbacks are available:
 
 	}
 	
-- onComplete fires when all points in options.locations have been processed:
+onComplete fires when all points in options.locations have been processed:
 	
 	onComplete: function(points){ 
 		// 'this' is the Google Maps object
 		// 'points' parameter is the number of points that successfully made it onto the map
 	};
 
-- onProcess fires right after a point has been geocoded (if the point is an address), or right before the point is added to the map (if the point is coords).
+onProcess fires right after a point has been geocoded (if the point is an address), or right before the point is added to the map (if the point is coords).
 
 	onProcess: function(location, statusCode){
 		statusCode = statusCode || 'This location was not geocoded.';
-		
+	
 		// 'this' is the Google Maps object
 		// 'location' parameter is the point
 		// 'statusCode' parameter is the status code returned from the geocoder (if applicable)
