@@ -1,16 +1,16 @@
 var GoogleMap = function( options ){
 
 	// param the options
-	options 				= options || {};
-	options.type 			= options.typle || G_NORMAL_MAP;
-	options.delay			= options.delay || 100;
-	options.defaultCenter	= options.defaultCenter || [0,0];
-	options.locations 		= options.locations || [];
-	options.onLoad			= options.onLoad || function(){};
-	options.onProcess		= options.onProcess || function(){};
-	options.onComplete		= options.onComplete || function(){};
+	options = options || {};
+	options.type = options.typle || G_NORMAL_MAP;
+	options.delay = options.delay || 100;
+	options.defaultCenter = options.defaultCenter || [0,0];
+	options.locations = options.locations || [];
+	options.onLoad = options.onLoad || function(){};
+	options.onProcess = options.onProcess || function(){};
+	options.onComplete = options.onComplete || function(){};
 	
-	var map, bounds, points = 0, counter = 0;
+	var map, geo, bounds, points = 0, counter = 0;
 	
 	// geocodes an address
 	var geocode = function( address, params ){
@@ -57,13 +57,10 @@ var GoogleMap = function( options ){
 	
 	// creates an info marker
 	var createMarker = function( point, params ){
-		params = params || {};
-		
 		var marker = new GMarker(point);
 		var html = options.template.replace(/#\{(.*?)\}/g, function($1, $2){
 			return ($2 in params) ? params[$2] : '';
 		});
-		
 		
 		GEvent.addListener(marker, "click", function(){
 			marker.openInfoWindowHtml(html);
