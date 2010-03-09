@@ -23,9 +23,6 @@ var map1 = new GoogleMap({
 	// delay between geocodings.  If you're getting a lot of 620 errors try increasing this
 	delay: 100,
 	
-	// default long, lat, and zoom level for when the map first loads
-	defaultCenter: [41.750824, -69.984283, 7],
-	
 	// locations to place on the map.  takes an array.
 	locations: [
 		['42.867912', '-75.981445', { 
@@ -89,14 +86,13 @@ map1.setOption('template', '<strong>#{title}</strong><div style="width:200px">#{
 // and points can be added like such::
 map1.addPoint('California, USA', { title:'California', description: 'Cali' });
 
-
 // let's create another map
 var map2 = new GoogleMap();
 map2.setOption('id', 'map2');
 map2.setOption('template', '<div>#{city}</div>');
 map2.setOption('type', G_HYBRID_MAP);
 map2.setOption('maxZoomLevel', 15);
-map2.addPoint("Boston, MA", { city:'Boston' });
+map2.addPoint("Boston, MA", { city:"Boston!" });
 </script>
 
 </head>

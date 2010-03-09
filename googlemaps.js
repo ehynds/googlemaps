@@ -7,8 +7,11 @@ var GoogleMap = function( options ){
 	options.GMapOptions = {};
 	
 	options.type = options.type || G_NORMAL_MAP;
+	options.controls = options.controls || true;
+	options.scrollWheelZoom = options.scrollWheelZoom || false;
 	options.delay = options.delay || 100;
-	options.defaultCenter = options.defaultCenter || [37.0625, -95.677068, 3];
+	options.defaultCenter = options.defaultCenter || [37.0625, -95.677068];
+	options.defaultZoom = options.defaultZoom || 3;
 	options.maxZoomLevel = 30;
 	options.locations = options.locations || [];
 	options.onLoad = options.onLoad || function(){};
@@ -35,13 +38,14 @@ var GoogleMap = function( options ){
 					
 					// send the coords into the mapper
 					addToMap(latitude, longitude, params);
-			
-				// if we overloaded the geocoder, retry this one again
+					
+				// if we overloaded the geocoder change the counter to retry this one again
 				} else if (statusCode === 620){
 					counter++;
 				}
 				
-				// keep processing if the point isn't legit.  note that if a 620 occured, calling process() will retry said point
+				// keep processing as long as anything other than 200 was returned.
+				// note that if a 620 occured, calling process() will retry said point
 				if(statusCode !== 200){
 					process();
 				}
@@ -68,28 +72,32 @@ var GoogleMap = function( options ){
 			return ($2 in params) ? params[$2] : '';
 		});
 		
-		GEvent.addListener(marker, "click", function(){
-			marker.openInfoWindowHtml(html);
-		});
+		// only bind the click event if there is something in the info window
+		if(html.replace(/^\s+|\s+$/g, '').length > 0){
+			GEvent.addListener(marker, "click", function(){
+				marker.openInfoWindowHtml(html);
+			});
+		}
 		
 		return marker;
 	};
 	
 	var process = function(){
 		counter--;
-		var coords, location = options.locations[ counter ];
 		
 		// once all the points are on the map, re-center/zoom it and bail
 		if(counter < 0){
 			var zoomlevel = map.getBoundsZoomLevel(bounds);
-			zoomlevel = zoomlevel > options.maxZoomLevel ? options.maxZoomLevel : zoomlevel;
+			zoomlevel = (zoomlevel > options.maxZoomLevel) ? options.maxZoomLevel : zoomlevel;
 			
 			map.setCenter(bounds.getCenter(), zoomlevel);
 			options.onComplete.call( map, points );
 			return;
 		}
 		
-		// param the last item as an object
+		var coords, location = options.locations[ counter ];
+		
+		// param the last item as an object (template vars)
 		if(typeof location[location.length-1] !== 'object'){
 			location.push({});
 		}
@@ -109,13 +117,20 @@ var GoogleMap = function( options ){
 	return {
 		draw: function(){
 			geo = new GClientGeocoder();
+			bounds = new GLatLngBounds();
 			map = new GMap2(document.getElementById(options.id), options.GMapOptions);
 			map.setMapType(options.type);
-			map.setUIToDefault();
-			map.setCenter(new GLatLng(options.defaultCenter[0], options.defaultCenter[1]), options.defaultCenter[2]);
+			map.setCenter(new GLatLng(options.defaultCenter[0], options.defaultCenter[1]), options.defaultZoom);
 			
-			bounds = new GLatLngBounds();
+			if(options.controls){
+				map.setUIToDefault();
 			
+				// in case you want to use scroll wheel zoom w/o controls
+				if(options.scrollWheelZoom){
+					map.enableScrollWheelZoom();
+				}
+			}
+
 			// how many points do we have?
 			counter = options.locations.length;
 			
