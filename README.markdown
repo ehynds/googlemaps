@@ -1,4 +1,4 @@
-** Google Maps
+## Google Maps
 
 This is a simple Google Maps script that addresses the following common issues I run into:
 
@@ -9,14 +9,16 @@ continue to re-try the address until any other status code is returned.
 - Re-centers and re-adjusts the zoom level after all points are on the map.
 - Provides three callbacks (onLoad, onProcess, and onComplete) allowing you to tap into each "phase" of the mapping process.
 
-*** Additional features
+### Additional features
 
 - Use multiple maps on the same page.
 - Info window click event is only bound if there is info to display.
 - Most common Google Map options are available: change map type, toggle controls, scrollWheelZoom, etc.
 - Configure a maximum zoom level for when the map re-centers and re-zoom's itself (useful if the points are added dynamically).
 
-*** Usage
+### Usage
+
+See the source for available options.
 
 	// pass an object literal of options to the constructor  
 	var map = new GoogleMap({ /* options here */ });
@@ -27,7 +29,7 @@ continue to re-try the address until any other status code is returned.
 	map.addPoint('some address', { /* info window template vars */ });
 	map.addPoint('longitude', 'latitude', {  /* info window template vars */ });
 	
-*** Templating
+### Templating
 
 This module comes with a real basic templating system (variable replacement only) for info windows.  Usage:
 
@@ -47,3 +49,13 @@ This module comes with a real basic templating system (variable replacement only
 			}]
 		]
 	});
+	
+### Todo
+
+Some things I still need to address:
+
+- Custom icons
+- Update to v3?
+
+
+
