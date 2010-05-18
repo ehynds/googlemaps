@@ -11,7 +11,6 @@ p { margin:0 }
 <script src="googlemaps.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-
 var map1 = new GoogleMap({
 	
 	// ID of the map div 
@@ -86,13 +85,25 @@ map1.setOption('template', '<strong>#{title}</strong><div style="width:200px">#{
 // and points can be added like such::
 map1.addPoint('California, USA', { title:'California', description: 'Cali' });
 
+
 // let's create another map
 var map2 = new GoogleMap();
 map2.setOption('id', 'map2');
 map2.setOption('template', '<div>#{city}</div>');
 map2.setOption('type', G_HYBRID_MAP);
 map2.setOption('maxZoomLevel', 15);
-map2.addPoint("Boston, MA", { city:"Boston!" });
+
+// register custom icons
+map2.setOption('icons', {
+	"bluedot": {
+		image: "http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/blank.png"
+	}
+})
+
+// use icons by passing a second config option
+map2.addPoint("Boston, MA", { city:"Boston!" }, { icon:"bluedot" });
+map2.addPoint("Newton, MA", { city:"Boston!" });
+map2.addPoint(37.0625, -95.677068, { city:"Middle of USA" });
 </script>
 
 </head>

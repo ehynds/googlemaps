@@ -6,6 +6,7 @@ var GoogleMap = function( options ){
 	// see http://code.google.com/apis/maps/documentation/reference.html#GMapOptions
 	options.GMapOptions = {};
 	
+	options.icons = options.icons || {};
 	options.type = options.type || G_NORMAL_MAP;
 	options.controls = options.controls || true;
 	options.scrollWheelZoom = options.scrollWheelZoom || false;
@@ -22,7 +23,7 @@ var GoogleMap = function( options ){
 	var map, geo, bounds, points = 0, counter = 0;
 	
 	// geocodes an address
-	var geocode = function( address, params ){
+	var geocode = function( address, params, config ){
 		
 		// send the address to the geocoder in a timer to prevent the G_GEO_TOO_MANY_QUERIES error
 		setTimeout(function(){
@@ -37,7 +38,7 @@ var GoogleMap = function( options ){
 					var place = result.Placemark[0], coords = place.Point.coordinates, latitude = coords[1], longitude = coords[0];
 					
 					// send the coords into the mapper
-					addToMap(latitude, longitude, params);
+					addToMap(latitude, longitude, params, config);
 					
 				// if we overloaded the geocoder change the counter to retry this one again
 				} else if (statusCode === 620){
@@ -54,8 +55,9 @@ var GoogleMap = function( options ){
 	};
 	
 	// adds a point to the map
-	var addToMap = function( latitude, longitude, params ){
-		var point = new GLatLng(latitude,longitude), marker = createMarker( point, params );
+	var addToMap = function( latitude, longitude, params, config ){
+		var point = new GLatLng(latitude,longitude), 
+			marker = createMarker( point, params, config );
 		
 		bounds.extend(point);
 		map.addOverlay(marker);
@@ -66,8 +68,21 @@ var GoogleMap = function( options ){
 	};
 	
 	// creates an info marker
-	var createMarker = function( point, params ){
-		var marker = new GMarker(point);
+	var createMarker = function( point, params, config ){
+		var markerOptions = {};
+		
+		if(config.icon && options.icons[config.icon]){
+			var opts = options.icons[config.icon],
+				icon = new GIcon(G_DEFAULT_ICON);
+			
+			for(var key in opts){
+				icon[key] = opts[key];
+			}
+			
+			markerOptions = { icon:icon };
+		}
+		
+		var marker = new GMarker(point, markerOptions);
 		var html = options.template.replace(/#\{(.*?)\}/g, function($1, $2){
 			return ($2 in params) ? params[$2] : '';
 		});
@@ -97,22 +112,24 @@ var GoogleMap = function( options ){
 			return;
 		}
 		
-		var coords, location = options.locations[ counter ];
+		var coords, data = options.locations[ counter ];
 		
-		// param the last item as an object (template vars)
-		if(typeof location[location.length-1] !== 'object'){
-			location.push({});
-		}
+		// param config/template vars, depending on if coords/address was passed in
+		if(data.length === 2){ data.push({}); }
 		
 		// is this location an address?
-		if(location.length === 2){
-			geocode(location[0],location[1]);
+		if(typeof data[0] === "string"){
+			geocode(data[0],data[1],data[2]);
 			
 		// otherwise it's coords
 		} else {
-			coords = location.slice(0,2);
+		
+			// ensure there is both a template struct and config struct
+			if(data.length === 3){ data.push({}); }
+			
+			coords = data.slice(0,2);
 			options.onProcess.call( map, coords );
-			addToMap( coords[0], coords[1], location[2] );
+			addToMap( coords[0], coords[1], data[2], data[3] );
 		}
 	};
 
@@ -148,12 +165,11 @@ var GoogleMap = function( options ){
 			options[key] = val;
 		},
 		
-		addPoint: function( lon, lat, params ){
+		addPoint: function( lon, lat, params, icon ){
 			options.locations.push(Array.prototype.slice.call(arguments));
 		},
 		
 		options: options
 	};
 };
-
 
